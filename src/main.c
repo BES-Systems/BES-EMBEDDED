@@ -5,6 +5,7 @@
 #include "bes/display.h"
 #include "bes/splash.h"
 #include "bes/boot.h"
+#include "bes/color.h"
 #include "bes/task.h"
 #include "bes/tasks/heartbeat.h"
 
@@ -14,6 +15,10 @@
 void app_main(void)
 {
     bes_boot_start();
+
+    bes_display_on();
+    bes_gpio_write(21, 1);
+    bes_display_fill(BES_RED);
 
     bes_task_create(
         "heartbeat",
