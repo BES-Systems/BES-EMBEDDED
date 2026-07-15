@@ -36,5 +36,9 @@ void app_main(void)
     while(1)
     {
         bes_task_delay(1000);
+
+        // bes_display_on();
+        // bes_delay(1000);
+        // bes_display_off();
     }
 }
