@@ -6,20 +6,10 @@
 #include "bes/splash.h"
 #include "bes/boot.h"
 #include "bes/task.h"
+#include "bes/tasks/heartbeat.h"
 
 
 #include <stdio.h>
-
-void heartbeat_task(void *arg)
-{
-    while(1)
-    {
-        bes_log("BES heartbeat");
-
-        bes_task_delay(1000);
-    }
-}
-
 
 void app_main(void)
 {
