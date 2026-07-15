@@ -1,0 +1,8 @@
+.pio/
+.vscode/
+.idea/
+sdkconfig
+*.swp
+*.swo
+*~
+.DS_Store
