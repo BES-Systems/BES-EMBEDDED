@@ -1,13 +1,14 @@
 #include "bes/board.h"
 #include "bes/gpio.h"
 #include "bes/time.h"
+#include "bes/log.h"
 
 #include <stdio.h>
 
 void app_main(void)
 {
-    printf("BES-Embedded booted\n");
-
+    bes_log("Embedded booted");
+    
     bes_gpio_output(BES_LED_PIN);
 
     while(1)
