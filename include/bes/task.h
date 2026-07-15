@@ -6,6 +6,7 @@
 
 typedef void (*bes_task_func_t)(void *);
 
+typedef void *bes_task_t;
 
 void bes_task_create(
     const char *name,
@@ -14,6 +15,8 @@ void bes_task_create(
     void *parameter,
     uint32_t priority
 );
+
+void bes_task_end(bes_task_t task);
 
 
 void bes_task_delay(
