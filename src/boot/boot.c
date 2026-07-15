@@ -19,9 +19,6 @@ static void boot_set_state(
     boot_state = state;
 }
 
-
-
-
 static void boot_hardware_init(void)
 {
     bes_log("[BOOT] Hardware init");
