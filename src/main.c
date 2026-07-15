@@ -1,14 +1,23 @@
+#include "bes/board.h"
+#include "bes/gpio.h"
+#include "bes/time.h"
+
 #include <stdio.h>
-#include "bes/kernel.h"
 
 void app_main(void)
 {
-    bes_kernel_init();
+    printf("BES-Embedded booted\n");
 
-    printf("\n");
-    printf("=========================\n");
-    printf("      BES-Embedded       \n");
-    printf("=========================\n");
-    printf("Hello World from BES OS!\n");
-    printf("=========================\n");
+    bes_gpio_output(BES_LED_PIN);
+
+    while(1)
+    {
+        printf("Hello BES!\n");
+
+        bes_gpio_write(BES_LED_PIN, 1);
+        bes_delay(500);
+
+        bes_gpio_write(BES_LED_PIN, 0);
+        bes_delay(500);
+    }
 }
