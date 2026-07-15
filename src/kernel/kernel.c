@@ -1,5 +1,6 @@
 #include "bes/kernel.h"
 #include "bes/device.h"
+#include "bes/version.h"
 
 #include "bes/log.h"
 
@@ -37,5 +38,11 @@ void bes_kernel_init(void)
     bes_kernel_device_init();
 
 
+    bes_log("[KERNEL_V] %s\n", BES_VERSION_STRING);
     bes_log("[KERNEL] Kernel ready");
 }
+// not used | for now.
+//const char *bes_kernel_version(void)
+//{
+//    return BES_KERNEL_VERSION;
+//}

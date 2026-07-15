@@ -1,0 +1,17 @@
+#ifndef BES_VERSION_H
+#define BES_VERSION_H
+
+#define BES_STR_HELPER(x) #x
+#define BES_STR(x) BES_STR_HELPER(x)
+
+#define BES_VERSION_MAJOR 0
+#define BES_VERSION_MINOR 1
+#define BES_VERSION_PATCH 0
+
+#define BES_VERSION_STRING \
+    BES_STR(BES_VERSION_MAJOR) "." \
+    BES_STR(BES_VERSION_MINOR) "." \
+    BES_STR(BES_VERSION_PATCH)
+
+
+#endif
