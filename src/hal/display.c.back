@@ -1,0 +1,49 @@
+#include "bes/display.h"
+#include "bes/gpio.h"
+#include "bes/log.h"
+
+#include <TFT_eSPI.h>
+
+
+#define DISPLAY_BACKLIGHT_PIN 21
+
+
+static TFT_eSPI tft = TFT_eSPI();
+
+
+void bes_display_init(void)
+{
+    bes_gpio_output(DISPLAY_BACKLIGHT_PIN);
+
+    tft.init();
+    tft.setRotation(1);
+
+    tft.fillScreen(TFT_BLACK);
+
+    bes_display_on();
+
+    bes_log("Display initialized");
+}
+
+
+void bes_display_on(void)
+{
+    bes_gpio_write(DISPLAY_BACKLIGHT_PIN, 1);
+}
+
+
+void bes_display_off(void)
+{
+    bes_gpio_write(DISPLAY_BACKLIGHT_PIN, 0);
+}
+
+
+void bes_display_print(const char *text)
+{
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.setTextSize(2);
+
+    tft.setCursor(10, 10);
+
+    tft.println(text);
+}
