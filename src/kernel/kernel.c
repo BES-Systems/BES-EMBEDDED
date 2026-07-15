@@ -1,4 +1,5 @@
 #include "bes/kernel.h"
+#include "bes/device.h"
 
 #include "bes/log.h"
 
@@ -17,6 +18,7 @@ static void bes_kernel_memory_init(void)
 
 static void bes_kernel_device_init(void)
 {
+    bes_device_init();
     bes_log("[ OK ] Device manager ready");
 }
 

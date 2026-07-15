@@ -1,6 +1,7 @@
 #include "bes/display.h"
 #include "bes/gpio.h"
 #include "bes/log.h"
+#include "bes/device.h"
 
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
@@ -198,6 +199,11 @@ void bes_display_init(void)
 
     bes_display_on();
     bes_log("Display initialized");
+
+    bes_device_register(
+        "display",
+        NULL
+    );
 }
 
 void bes_display_on(void)
