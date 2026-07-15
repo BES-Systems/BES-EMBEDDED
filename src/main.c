@@ -3,17 +3,16 @@
 #include "bes/time.h"
 #include "bes/log.h"
 #include "bes/display.h"
+#include "bes/splash.h"
+#include "bes/boot.h"
+
 
 
 #include <stdio.h>
 
 void app_main(void)
 {
-    bes_log("BES-Embedded booted");
-
-    bes_display_init();
-
-    bes_display_print("Hello BES");
+    bes_boot_start();
 
     while(1)
     {
