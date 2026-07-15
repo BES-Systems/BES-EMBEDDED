@@ -5,17 +5,36 @@
 #include "bes/display.h"
 #include "bes/splash.h"
 #include "bes/boot.h"
-
+#include "bes/task.h"
 
 
 #include <stdio.h>
+
+void heartbeat_task(void *arg)
+{
+    while(1)
+    {
+        bes_log("BES heartbeat");
+
+        bes_task_delay(1000);
+    }
+}
+
 
 void app_main(void)
 {
     bes_boot_start();
 
+    bes_task_create(
+        "heartbeat",
+        heartbeat_task,
+        2048,
+        NULL,
+        5
+    );
+
     while(1)
     {
-        bes_delay(1000);
+        bes_task_delay(1000);
     }
 }
