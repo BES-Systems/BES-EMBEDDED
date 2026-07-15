@@ -9,7 +9,9 @@
 
 static bes_boot_state_t boot_state;
 
-
+/**
+ * @brief Set the current boot state
+ */
 static void boot_set_state(
     bes_boot_state_t state
 )
@@ -80,11 +82,6 @@ static void boot_kernel_start(void)
 
 void bes_boot_start(void)
 {
-    bes_log("==============================");
-    bes_log("       BES-Embedded Boot");
-    bes_log("==============================");
-
-
     boot_set_state(
         BES_BOOT_POWER_ON
     );
@@ -113,7 +110,5 @@ void bes_boot_start(void)
     );
 
 
-    bes_log("==============================");
     bes_log("     BES SYSTEM READY");
-    bes_log("==============================");
 }
