@@ -38,25 +38,6 @@ Current development goals:
 
 ---
 
-## Architecture
-
-+--------------------------------+
-| Applications |
-| HMI | Control | Monitoring |
-+--------------------------------+
-| BES Runtime |
-| APIs | Services | Drivers |
-+--------------------------------+
-| BES Kernel |
-| Scheduler | Memory | Security |
-+--------------------------------+
-| Hardware |
-| ESP32 | RISC-V | ARM |
-+--------------------------------+
-
-
----
-
 ## Supported Hardware
 
 ### Current
