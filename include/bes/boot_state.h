@@ -1,0 +1,22 @@
+#ifndef BES_BOOT_STATE_H
+#define BES_BOOT_STATE_H
+
+
+typedef enum
+{
+    BES_BOOT_POWER_ON,
+
+    BES_BOOT_HARDWARE_INIT,
+
+    BES_BOOT_DISPLAY_INIT,
+
+    BES_BOOT_SYSTEM_CHECK,
+
+    BES_BOOT_SERVICES_START,
+
+    BES_BOOT_COMPLETE
+
+} bes_boot_state_t;
+
+
+#endif
