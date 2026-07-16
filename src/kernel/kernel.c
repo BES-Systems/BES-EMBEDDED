@@ -4,7 +4,8 @@
 
 #include "bes/log.h"
 
-
+// TODO: Make the actual scheduler, and
+// it's initialization process.
 static void bes_kernel_scheduler_init(void)
 {
     bes_log("[ OK ] Scheduler ready");

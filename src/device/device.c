@@ -58,9 +58,6 @@ int bes_device_register(
     return 0;
 }
 
-
-
-
 bes_device_t *bes_device_get(
     const char *name
 )
