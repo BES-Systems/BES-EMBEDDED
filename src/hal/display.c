@@ -2,6 +2,7 @@
 #include "bes/gpio.h"
 #include "bes/log.h"
 #include "bes/device.h"
+#include "bes/board.h"
 
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
@@ -23,7 +24,7 @@
 #define PIN_NUM_CS     15
 #define PIN_NUM_DC      2
 #define PIN_NUM_RST     4
-#define PIN_NUM_BCKL   21
+// #define PIN_NUM_BCKL   21
 
 #define SPI_HOST_ID     SPI2_HOST
 
@@ -31,6 +32,7 @@
 #define CMD_MADCTL      0x36
 #define CMD_SLPOUT      0x11
 #define CMD_DISPON      0x29
+
 
 static esp_lcd_panel_io_handle_t s_io_handle = NULL;
 
@@ -154,7 +156,8 @@ static inline uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
 
 void bes_display_init(void)
 {
-    bes_gpio_output(PIN_NUM_BCKL);
+    int pin = bes_board_display_backlight_pin();
+    bes_gpio_output(pin);
 
     gpio_config_t rst_conf = {
         .pin_bit_mask = (1ULL << PIN_NUM_RST),
@@ -208,14 +211,18 @@ void bes_display_init(void)
 
 void bes_display_on(void)
 {
-    bes_gpio_write(PIN_NUM_BCKL, 1);
+    int pin = bes_board_display_backlight_pin();
+    bes_gpio_output(pin);
+    bes_gpio_write(pin, 1);
     send_cmd(CMD_DISPON);
 }
 
 void bes_display_off(void)
 {
+    int pin = bes_board_display_backlight_pin();
+    bes_gpio_output(pin);
     send_cmd(0x28);
-    bes_gpio_write(PIN_NUM_BCKL, 0);
+    bes_gpio_write(pin, 0);
 }
 
 void bes_display_fill(uint16_t color)
