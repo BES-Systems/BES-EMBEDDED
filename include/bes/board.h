@@ -11,4 +11,10 @@ int bes_board_display_backlight_pin(void);
 
 const char *bes_board_name(void);
 
+/**
+ * @todo: Add defined board-types,
+ * where we load the selected
+ * board from compile-time flags.
+ */
+
 #endif
