@@ -7,6 +7,11 @@
 #include "bes/boot.h"
 #include "bes/color.h"
 #include "bes/task.h"
+#include "bes/wifi.h"
+#include "bes/http.h"
+#include "bes/net.h"
+
+
 #include "bes/tasks/heartbeat.h"
 
 
@@ -18,6 +23,19 @@
 void app_main(void)
 {
     bes_boot_start();
+
+
+    bes_wifi_init();
+
+    bes_wifi_connect(
+        "Proximus-Home-D518",
+        ""
+    );
+
+
+    bes_http_start();
+
+    bes_net_print_ip();
 
     // bes_display_on();
     // bes_gpio_write(21, 1);

@@ -23,7 +23,7 @@
 #define PIN_NUM_SCLK   14
 #define PIN_NUM_CS     15
 #define PIN_NUM_DC      2
-#define PIN_NUM_RST     4
+#define PIN_NUM_RST     -1
 // #define PIN_NUM_BCKL   21
 
 #define SPI_HOST_ID     SPI2_HOST
@@ -159,6 +159,8 @@ void bes_display_init(void)
     int pin = bes_board_display_backlight_pin();
     bes_gpio_output(pin);
 
+    #if PIN_NUM_RST >= 0
+
     gpio_config_t rst_conf = {
         .pin_bit_mask = (1ULL << PIN_NUM_RST),
         .mode = GPIO_MODE_OUTPUT,
@@ -166,11 +168,12 @@ void bes_display_init(void)
 
     gpio_config(&rst_conf);
 
-    gpio_set_level(PIN_NUM_RST, 0);
+    gpio_set_level(PIN_NUM_RST,0);
     vTaskDelay(pdMS_TO_TICKS(20));
-
-    gpio_set_level(PIN_NUM_RST, 1);
+    gpio_set_level(PIN_NUM_RST,1);
     vTaskDelay(pdMS_TO_TICKS(150));
+
+    #endif
 
     spi_bus_config_t bus_cfg = {
         .mosi_io_num = PIN_NUM_MOSI,
@@ -195,10 +198,20 @@ void bes_display_init(void)
 
     ili9341_init_sequence();
 
-    s_framebuf = heap_caps_malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * 2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-    if (!s_framebuf) {
-        s_framebuf = heap_caps_malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * 2, MALLOC_CAP_8BIT);
+    size_t fb_size = DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint16_t);
+
+    s_framebuf = heap_caps_malloc(
+        fb_size,
+        MALLOC_CAP_8BIT
+    );
+
+    if(!s_framebuf)
+    {
+        bes_log("Framebuffer allocation failed");
+        return;
     }
+
+    bes_log("Framebuffer allocated");
 
     bes_display_on();
     bes_log("Display initialized");
@@ -212,33 +225,70 @@ void bes_display_init(void)
 void bes_display_on(void)
 {
     int pin = bes_board_display_backlight_pin();
-    bes_gpio_output(pin);
-    bes_gpio_write(pin, 1);
+
+    if (pin >= 0)
+    {
+        bes_gpio_output(pin);
+        bes_gpio_write(pin, 1);
+    }
+
     send_cmd(CMD_DISPON);
 }
 
 void bes_display_off(void)
 {
     int pin = bes_board_display_backlight_pin();
-    bes_gpio_output(pin);
+
     send_cmd(0x28);
-    bes_gpio_write(pin, 0);
+
+    if (pin >= 0)
+    {
+        bes_gpio_write(pin, 0);
+    }
 }
 
 void bes_display_fill(uint16_t color)
 {
-    for (int i = 0; i < DISPLAY_WIDTH * DISPLAY_HEIGHT; i++) {
+    if (!s_framebuf)
+    {
+        bes_log("Framebuffer NULL");
+        return;
+    }
+
+    for (int i = 0; i < DISPLAY_WIDTH * DISPLAY_HEIGHT; i++)
+    {
         s_framebuf[i] = color;
     }
 
-    uint8_t caset[4] = { 0, 0, (uint8_t)((DISPLAY_WIDTH - 1) >> 8), (uint8_t)(DISPLAY_WIDTH - 1) };
-    send_cmd(0x2A);
-    send_param(caset, 4);
-    uint8_t raset[4] = { 0, 0, (uint8_t)((DISPLAY_HEIGHT - 1) >> 8), (uint8_t)(DISPLAY_HEIGHT - 1) };
-    send_cmd(0x2B);
-    send_param(raset, 4);
 
-    send_color(s_framebuf, DISPLAY_WIDTH * DISPLAY_HEIGHT * 2);
+    uint8_t caset[4] =
+    {
+        0x00,
+        0x00,
+        (uint8_t)((DISPLAY_WIDTH - 1) >> 8),
+        (uint8_t)(DISPLAY_WIDTH - 1)
+    };
+
+    send_cmd(0x2A);
+    send_param(caset,4);
+
+
+    uint8_t raset[4] =
+    {
+        0x00,
+        0x00,
+        (uint8_t)((DISPLAY_HEIGHT - 1) >> 8),
+        (uint8_t)(DISPLAY_HEIGHT - 1)
+    };
+
+    send_cmd(0x2B);
+    send_param(raset,4);
+
+
+    send_color(
+        s_framebuf,
+        DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(uint16_t)
+    );
 }
 
 static const uint8_t FONT_5X7[96][5] = {
@@ -279,66 +329,98 @@ static const uint8_t FONT_5X7[96][5] = {
 void bes_display_print(const char *text)
 {
     bes_log("Drawing text");
-    if(s_framebuf)
-    {
-        bes_log("Framebuffer OK");
-    }
-    else
+
+    if(!s_framebuf)
     {
         bes_log("Framebuffer FAILED");
+        return;
     }
+
+    bes_log("Framebuffer OK");
+
 
     for(int i = 0; i < DISPLAY_WIDTH * DISPLAY_HEIGHT; i++)
     {
-        s_framebuf[i] = 0xFFFF;
+        s_framebuf[i] = 0x0000; // black background
     }
 
-    int x = 100;
-    int y = 100;
 
-    for (const char *p = text; *p; p++) {
+    int x = 10;
+    int y = 10;
+
+    for(const char *p = text; *p; p++)
+    {
         char c = *p;
-        if (c == '\n') {
+
+        if(c == '\n')
+        {
             x = 10;
-            y += 8;
+            y += 12;
             continue;
         }
-        if (c < 0x20 || c > 0x7E) c = '?';
+
+        if(c < 0x20 || c > 0x7E)
+            c = '?';
+
+
         int idx = c - 0x20;
 
-        for (int col = 0; col < 5; col++) {
+
+        for(int col = 0; col < 5; col++)
+        {
             uint8_t bits = FONT_5X7[idx][col];
-            for (int row = 0; row < 7; row++) {
-                if (bits & (1 << row)) {
-                    int px = x + col;
-                    int py = y + row;
-                    if (px < DISPLAY_WIDTH && py < DISPLAY_HEIGHT) {
-                        for(int dx = 0; dx < 3; dx++)
-                        {
-                            for(int dy = 0; dy < 3; dy++)
-                            {
-                                s_framebuf[
-                                    (py+dy)*DISPLAY_WIDTH+(px+dx)
-                                ] = color565(255,255,255);
-                            }
-                        }
+
+            for(int row = 0; row < 7; row++)
+            {
+                if(bits & (1 << row))
+                {
+                    int px = x + col * 2;
+                    int py = y + row * 2;
+
+
+                    if(px < DISPLAY_WIDTH && py < DISPLAY_HEIGHT)
+                    {
+                        s_framebuf[
+                            py * DISPLAY_WIDTH + px
+                        ] = color565(255,255,255);
                     }
                 }
             }
         }
-        x += 6;
-        if (x + 5 > DISPLAY_WIDTH) {
-            x = 10;
-            y += 8;
-        }
+
+
+        x += 12;
     }
 
-    uint8_t caset[4] = { 0, 0, (uint8_t)((DISPLAY_WIDTH - 1) >> 8), (uint8_t)(DISPLAY_WIDTH - 1) };
-    send_cmd(0x2A);
-    send_param(caset, 4);
-    uint8_t raset[4] = { 0, 0, (uint8_t)((DISPLAY_HEIGHT - 1) >> 8), (uint8_t)(DISPLAY_HEIGHT - 1) };
-    send_cmd(0x2B);
-    send_param(raset, 4);
 
-    send_color(s_framebuf, DISPLAY_WIDTH * DISPLAY_HEIGHT * 2);
+    uint8_t caset[4] =
+    {
+        0x00,
+        0x00,
+        (uint8_t)((DISPLAY_WIDTH - 1) >> 8),
+        (uint8_t)(DISPLAY_WIDTH - 1)
+    };
+    send_cmd(0x2A);
+    send_param(caset,4);
+
+
+    uint8_t raset[4] =
+    {
+        0x00,
+        0x00,
+        (uint8_t)((DISPLAY_HEIGHT - 1) >> 8),
+        (uint8_t)(DISPLAY_HEIGHT - 1)
+    };
+
+    send_cmd(0x2B);
+    send_param(raset,4);
+
+
+    send_color(
+        s_framebuf,
+        DISPLAY_WIDTH * DISPLAY_HEIGHT * 2
+    );
+
+
+    bes_log("Text rendered");
 }
