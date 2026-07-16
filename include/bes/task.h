@@ -8,7 +8,7 @@ typedef void (*bes_task_func_t)(void *);
 
 typedef void *bes_task_t;
 
-void bes_task_create(
+bes_task_t bes_task_create(
     const char *name,
     bes_task_func_t function,
     uint32_t stack_size,
@@ -18,10 +18,6 @@ void bes_task_create(
 
 void bes_task_end(bes_task_t task);
 
-
-void bes_task_delay(
-    uint32_t milliseconds
-);
-
+void bes_task_delay(uint32_t milliseconds);
 
 #endif

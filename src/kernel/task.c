@@ -6,7 +6,7 @@
 
 
 
-void bes_task_create(
+bes_task_t bes_task_create(
     const char *name,
     bes_task_func_t function,
     uint32_t stack_size,
@@ -14,9 +14,6 @@ void bes_task_create(
     uint32_t priority
 )
 {
-
-    // like the other versions, we set the handle
-    // to `NULL`, but now with a TaskHandle_t.
     TaskHandle_t handle = NULL;
 
     xTaskCreate(
@@ -28,9 +25,7 @@ void bes_task_create(
         &handle
     );
 
-    // We now return this
     return (bes_task_t)handle;
-    
 }
 
 void bes_task_end(bes_task_t task)
